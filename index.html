@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/stylesheet.css">
+  <title>電卓</title>
+</head>
+<body>
+  <div id="stage">
+    <div id="screen">
+      
+      <p class="text1"></p>
+      <p class="text2"></p>
+    </div>
+    <ul>
+      <li class="num">7</li>
+      <li class="num">8</li>
+      <li class="num">9</li>
+      <li id="ac" class="colspan">AC</li>
+      <li class="num">4</li>
+      <li class="num">5</li>
+      <li class="num">6</li>
+      <li id="waru">÷</li>
+      <li id="kake">×</li>
+      <li class="num">1</li>
+      <li class="num">2</li>
+      <li class="num">3</li>
+      <li id="hiku">−</li>
+      <li id="tasu">+</li>
+      <li class="colspan num">0</li>
+      <li id="ten">.</li>
+      <li id="wa" class="colspan">=</li>
+    </ul>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script>
+    var numbtn = $(".num");
+    var scr1 = $("#screen .text1");
+    var scr2 = $("#screen .text2");
+    var ten = $("#ten");
+    var tasu = $("#tasu");
+    var hiku = $("#hiku");
+    var kake = $("#kake");
+    var waru = $("#waru");
+    var wa = $("#wa");
+    var ac = $("#ac");
+
+    var tenflg = false; //小数点が使える状況かどうかを判断するフラグ
+    var second = false;
+    var keisan1,keisan2;
+    var calc;
+    var kigou;
+    var kekka;
+
+    //全ての表示を消す関数
+    function allclear(){
+      scr1.text("");
+      scr2.text("");
+      keisan1 = keisan2 = calc = "";
+    }
+    
+    //#screenに数字を表示する関数
+    function hyoji1(i){
+      var j = scr1.text();
+      scr1.text(j+i);
+    }
+    function hyoji2(i){
+      var j = scr2.text();
+      scr2.text(j+i);
+    }
+
+    //表示されている数字をkeisan1に保存して液晶表示を消す関数
+    function save(){
+      keisan1 = scr2.text();
+      scr2.text("");
+    }
+
+    //数字ボタンをクリックした時の処理
+    numbtn.click(function(){
+      if(second == true){ //2回目以降の計算の場合
+        allclear(); //表示をクリア
+        second = false; //secondフラグの無効化
+      }
+      var moji = $(this).text(); //クリックしたボタンの文字をmojiに格納
+      hyoji1(moji); //text1へ格納した文字を表示させる
+      hyoji2(moji); //text2へ格納した文字を表示させる
+    });
+
+    //小数点ボタンを押した時の処理
+    ten.click(function(){
+      if(tenflg == false){ //小数点フラグがfalseの場合
+        if(second == true){ //2回目以降の計算の場合
+          allclear(); //表示をクリア
+          second = false; // secondフラグの無効化
+        }
+        var moji = $(this).text();
+        hyoji1(moji); //text1へ格納した文字を表示させる
+        hyoji2(moji); //text2へ格納した文字を表示させる
+      }
+    });
+
+    //「AC」ボタンを押した時の処理
+    ac.click(function(){
+      allclear(); //全てクリア
+    });
+
+    //「＋」ボタンを押した時の処理
+    tasu.click(function(){
+      save(); //入力されているkeisan1へ保存
+      kigou = tasu.text(); //kigouへ数式記号を保存
+      hyoji1(kigou); //p.text1へ数式記号を表示させる
+      calc = 1; //計算タイプを記述(1 = 足し算)
+      second = tenflg = false; //secondフラグと小数点フラグを無効化
+    });
+
+    //「-」ボタンを押した時の処理
+    hiku.click(function(){
+      save(); //入力されているkeisan1へ保存
+      kigou = hiku.text(); //kigouへ数式記号を保存
+      hyoji1(kigou); //p.text1へ数式記号を表示させる
+      calc = 2; //計算タイプを記述(2 = 引き算)
+      second = tenflg = false; //secondフラグと小数点フラグを無効化
+    });
+
+    //「×」ボタンを押した時の処理
+    kake.click(function(){
+      save(); //入力されているkeisan1へ保存
+      kigou = kake.text(); //kigouへ数式記号を保存
+      hyoji1(kigou); //p.text1へ数式記号を表示させる
+      calc = 3; //計算タイプを記述(3 = 掛け算)
+      second = tenflg = false; //secondフラグと小数点フラグを無効化
+    });
+
+    //「÷」ボタンを押した時の処理
+    waru.click(function(){
+      save(); //入力されているkeisan1へ保存
+      kigou = waru.text(); //kigouへ数式記号を保存
+      hyoji1(kigou); //p.text1へ数式記号を表示させる
+      calc = 4; //計算タイプを記述(4 = 割り算)
+      second = tenflg = false; //secondフラグと小数点フラグを無効化
+    });
+
+    //「=」ボタンを押した時の処理
+    wa.click(function(){
+      keisan2 = scr2.text(); //入力されている文字をkeisan2へ保存
+      if(calc == 1){ //足し算ならば
+        kekka = Number(keisan1) + Number(keisan2);
+      }else if(calc == 2){ //引き算ならば
+        kekka = Number(keisan1) - Number(keisan2);
+      }else if(calc == 3){ //足し算ならば
+        kekka = Number(keisan1) * Number(keisan2);
+      }else if(calc == 4){ //割り算ならば
+        kekka = Number(keisan1) / Number(keisan2);
+      }
+      scr2.text(kekka); //計算結果をp.text2へ表示させる
+      tenflg = false; //小数点フラグを無効化
+      second = true; //secondフラグをtrueへ
+    });
+  </script>
+
+
+</body>
+</html>
